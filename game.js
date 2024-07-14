@@ -26,19 +26,17 @@ let highScore = 0;
 let scoreText;
 let aiMode = false;
 let running = false;
-let snakeSpeed = 150;
 let directions = { left: 'left', right: 'right', up: 'up', down: 'down' };
 
 function preload() {
     this.load.image('food', 'apple.gif');  // Ensure this path is correct
+    this.load.image('snake', null);  // Using null image for snake parts
 }
 
 function create() {
     // Create snake head
     snake = this.physics.add.group();
-    let head = this.physics.add.image(300, 300, null).setOrigin(0);
-    head.setFillStyle(0x00ff00);
-    head.body.setSize(20, 20).setOffset(0, 0);
+    let head = this.physics.add.image(300, 300, 'snake').setOrigin(0).setDisplaySize(20, 20);
     head.setTint(0x00ff00);
     head.direction = 'stop';
     snake.add(head);
@@ -90,22 +88,20 @@ function showMenu() {
 function startGame() {
     running = true;
     aiMode = false;
-    resetGame();
+    resetGame(this);
 }
 
 function startAIMode() {
     running = true;
     aiMode = true;
-    resetGame();
+    resetGame(this);
 }
 
-function resetGame() {
+function resetGame(scene) {
     score = 0;
     snake.clear(true, true);
 
-    let head = this.physics.add.image(300, 300, null).setOrigin(0);
-    head.setFillStyle(0x00ff00);
-    head.body.setSize(20, 20).setOffset(0, 0);
+    let head = scene.physics.add.image(300, 300, 'snake').setOrigin(0).setDisplaySize(20, 20);
     head.setTint(0x00ff00);
     head.direction = 'stop';
     snake.add(head);
@@ -114,14 +110,15 @@ function resetGame() {
 }
 
 function moveSnake(head) {
+    let speed = 20;
     if (head.direction === 'left') {
-        head.x -= snakeSpeed / 10;
+        head.x -= speed;
     } else if (head.direction === 'right') {
-        head.x += snakeSpeed / 10;
+        head.x += speed;
     } else if (head.direction === 'up') {
-        head.y -= snakeSpeed / 10;
+        head.y -= speed;
     } else if (head.direction === 'down') {
-        head.y += snakeSpeed / 10;
+        head.y += speed;
     }
 }
 
@@ -134,9 +131,7 @@ function eatFood(head, food) {
     scoreText.setText('Score: ' + score + '  High Score: ' + highScore);
 
     // Add new segment
-    let newSegment = this.physics.add.image(head.x, head.y, null).setOrigin(0);
-    newSegment.setFillStyle(0x00ff00);
-    newSegment.body.setSize(20, 20).setOffset(0, 0);
+    let newSegment = this.physics.add.image(head.x, head.y, 'snake').setOrigin(0).setDisplaySize(20, 20);
     newSegment.setTint(0x00ff00);
     snake.add(newSegment);
 }
