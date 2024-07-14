@@ -8,6 +8,12 @@ const config = {
         preload: preload,
         create: create,
         update: update
+    },
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: false
+        }
     }
 };
 
@@ -19,8 +25,7 @@ let score = 0;
 let scoreText;
 
 function preload() {
-    // Load assets
-    this.load.image('food', 'https://aryamazloomi.github.io/snake-js/apple.gif');  // Ensure this path is correct
+    this.load.image('food', 'apple.gif');  // Ensure this path is correct
 }
 
 function create() {
@@ -28,6 +33,8 @@ function create() {
     snake = this.add.group();
     const head = this.add.rectangle(300, 300, 20, 20, 0x00ff00);
     this.physics.add.existing(head);
+    head.body.setCollideWorldBounds(true);
+    head.direction = null;
     snake.add(head);
 
     // Create food
@@ -40,24 +47,29 @@ function create() {
     // Create score text
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
 
+    // Make sure food gets eaten
     this.physics.add.overlap(head, food, eatFood, null, this);
 }
 
 function update() {
     let head = snake.getChildren()[0];
 
-    if (cursors.left.isDown) {
-        head.setVelocityX(-160);
-        head.setVelocityY(0);
-    } else if (cursors.right.isDown) {
-        head.setVelocityX(160);
-        head.setVelocityY(0);
-    } else if (cursors.up.isDown) {
-        head.setVelocityY(-160);
-        head.setVelocityX(0);
-    } else if (cursors.down.isDown) {
-        head.setVelocityY(160);
-        head.setVelocityX(0);
+    if (cursors.left.isDown && head.direction !== 'right') {
+        head.direction = 'left';
+    } else if (cursors.right.isDown && head.direction !== 'left') {
+        head.direction = 'right';
+    } else if (cursors.up.isDown && head.direction !== 'down') {
+        head.direction = 'up';
+    } else if (cursors.down.isDown && head.direction !== 'up') {
+        head.direction = 'down';
+    }
+
+    if (head.direction) {
+        moveSnake(head.direction);
+    }
+
+    if (Phaser.Geom.Intersects.RectangleToRectangle(head.getBounds(), food.getBounds())) {
+        eatFood(head, food);
     }
 }
 
@@ -66,6 +78,24 @@ function eatFood(head, food) {
     score += 10;
     scoreText.setText('Score: ' + score);
     addSegment();
+}
+
+function moveSnake(direction) {
+    let head = snake.getChildren()[0];
+    let x = head.x;
+    let y = head.y;
+
+    if (direction === 'left') {
+        x -= 20;
+    } else if (direction === 'right') {
+        x += 20;
+    } else if (direction === 'up') {
+        y -= 20;
+    } else if (direction === 'down') {
+        y += 20;
+    }
+
+    head.setPosition(x, y);
 }
 
 function addSegment() {
