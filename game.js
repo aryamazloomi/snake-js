@@ -20,7 +20,7 @@ let scoreText;
 
 function preload() {
     // Load assets
-    this.load.image('food', 'https://aryamazloomi.github.io/snake-js/apple.gifapple.gif');  // Ensure this path is correct
+    this.load.image('food', 'https://aryamazloomi.github.io/snake-js/apple.gif');  // Ensure this path is correct
 }
 
 function create() {
